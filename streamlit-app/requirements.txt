@@ -1,0 +1,10 @@
+streamlit
+pandas
+numpy
+matplotlib
+altair
+requests
+python-dotenv
+streamlit-aggrid
+
+
