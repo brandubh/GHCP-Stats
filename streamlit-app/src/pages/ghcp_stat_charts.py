@@ -124,36 +124,43 @@ def page1():
         
         st.altair_chart(chart3, use_container_width=True)
         
-        st.subheader("Acceptance Rate by Top Languages")
-        
-        # Calculate total suggestions per language to find top 5
-        lang_totals = df.groupby("language").agg({
-            "suggested": "sum"
-        }).reset_index().nlargest(5, "suggested")
-        top_languages = lang_totals["language"].tolist()
-        
-        # Filter for top 5 languages and calculate their acceptance rates
-        df_top_langs = df[df["language"].isin(top_languages)]
-        
-        # Calculate overall acceptance rate by date and language
-        df_rate_lang = df_top_langs.groupby(["date", "language"]).agg({
-            "accepted": "sum",
-            "suggested": "sum"
-        }).reset_index()
-        df_rate_lang["acceptance_rate"] = (df_rate_lang["accepted"] / df_rate_lang["suggested"] * 100)
-        
-        # Create the language acceptance rate chart
-        chart4 = alt.Chart(df_rate_lang).mark_line(point=True).encode(
-            x='date:T',
-            y=alt.Y('acceptance_rate:Q', title='Acceptance Rate (%)'),
-            color=alt.Color('language:N', title='Language'),
-            tooltip=['date:T', 'language:N', alt.Tooltip('acceptance_rate:Q', format='.1f')]
-        ).properties(
-            width=700,
-            height=400
-        )
-        
-        st.altair_chart(chart4, use_container_width=True)
+        # --- Code Metrics ---
+        st.subheader("Code Metrics")
+        lang_df = helpers.load_code_metrics(records)
+        if lang_df.empty:
+            st.info("No code metrics available for selected filters.")
+        else:
+            # Show top 10 languages by volume
+            top_df = lang_df.head(5)
+
+            # Create chart
+            chart = alt.Chart(top_df).mark_bar().encode(
+                x=alt.X('Language:N', sort='-y'),
+                y=alt.Y('Acceptance Rate:Q', title='Acceptance Rate (%)'),
+                color=alt.Color('Language:N', legend=None),
+                tooltip=[
+                    alt.Tooltip('Language:N'),
+                    alt.Tooltip('Acceptance Rate:Q', format='.1f'),
+                    alt.Tooltip('Suggested Lines:Q', format=','),
+                    alt.Tooltip('Accepted Lines:Q', format=',')
+                ]
+            ).properties(
+                title='Acceptance Rate by Language (Top 10 by Volume)',
+                width=700,
+                height=400
+            )
+
+            st.altair_chart(chart, use_container_width=True)
+
+            # Show detailed stats table
+            st.subheader("Detailed Statistics")
+            st.dataframe(
+                top_df.style.format({
+                    'Acceptance Rate': '{:.1f}%',
+                    'Suggested Lines': '{:,.0f}',
+                    'Accepted Lines': '{:,.0f}'
+                })
+            )
 
 if __name__ == "__main__":
     page1()

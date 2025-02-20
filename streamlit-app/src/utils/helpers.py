@@ -118,3 +118,38 @@ def record_code_metrics(record, sel_editors, sel_models, sel_languages):
                     suggested += lang.get("total_code_lines_suggested", 0)
                     accepted += lang.get("total_code_lines_accepted", 0)
     return suggested, accepted
+
+def load_code_metrics(records):
+    # Get language data from records
+    language_stats = {}
+    for record in records:
+        completions = record["data"].get("copilot_ide_code_completions", {})
+        if completions and "editors" in completions:
+            for editor in completions["editors"]:
+                for model in editor.get("models", []):
+                    for lang in model.get("languages", []):
+                        lang_name = lang.get("name", "Unknown")
+                        suggested = lang.get("total_code_lines_suggested", 0)
+                        accepted = lang.get("total_code_lines_accepted", 0)
+                        
+                        if lang_name not in language_stats:
+                            language_stats[lang_name] = {"suggested": 0, "accepted": 0}
+                        
+                        language_stats[lang_name]["suggested"] += suggested
+                        language_stats[lang_name]["accepted"] += accepted
+
+    # Create DataFrame for visualization
+    data = []
+    for lang, stats in language_stats.items():
+        if stats["suggested"] > 0:  # Only include languages with suggestions
+            acceptance_rate = (stats["accepted"] / stats["suggested"]) * 100
+            data.append({
+                "Language": lang,
+                "Acceptance Rate": acceptance_rate,
+                "Suggested Lines": stats["suggested"],
+                "Accepted Lines": stats["accepted"]
+            })
+
+    df = pd.DataFrame(data)
+    df = df.sort_values("Suggested Lines", ascending=False)
+    return df
