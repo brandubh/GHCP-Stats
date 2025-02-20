@@ -2,15 +2,24 @@ import streamlit as st
 import subprocess
 import os
 from utils.import_ghcp import import_metrics
+from utils.helpers import get_data_range
 from dotenv import load_dotenv
 
 def main():
-    st.title("My Streamlit App")
-    st.write("Welcome to my Streamlit application!")
+    st.title("GitHub Copilot Statistics")
     load_dotenv()
+    
+    # Show data range information
+    min_date, max_date = get_data_range()
+    if min_date and max_date:
+        st.info(f"📊 Data available from {min_date} to {max_date}")
+    
     # Add your Streamlit components here
     if st.button("Import Data"):
         import_metrics()
+        # Refresh date range after import
+        min_date, max_date = get_data_range()
+        st.rerun()
     
     if st.button("Export Database"):
         db_path = os.getenv("DB_NAME", "metrics.db")

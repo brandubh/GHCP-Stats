@@ -37,6 +37,15 @@ def get_connection():
         conn.commit()
     return conn
 
+def get_data_range():
+    """Get the earliest and latest dates from the metrics database."""
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT MIN(date), MAX(date) FROM metrics")
+    min_date, max_date = cur.fetchone()
+    conn.close()
+    return min_date, max_date
+
 # --- Data Loading & Aggregation ---
 def load_metrics(date_range, orgs):
     conn = get_connection()
