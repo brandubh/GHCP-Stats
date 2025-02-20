@@ -119,15 +119,21 @@ def record_code_metrics(record, sel_editors, sel_models, sel_languages):
                     accepted += lang.get("total_code_lines_accepted", 0)
     return suggested, accepted
 
-def load_code_metrics(records):
+def load_code_metrics(records, sel_editors, sel_models, sel_languages):
     # Get language data from records
     language_stats = {}
     for record in records:
         completions = record["data"].get("copilot_ide_code_completions", {})
         if completions and "editors" in completions:
             for editor in completions["editors"]:
+                if sel_editors and editor.get("name") not in sel_editors:
+                    continue
                 for model in editor.get("models", []):
+                    if sel_models and model.get("name") not in sel_models:
+                        continue
                     for lang in model.get("languages", []):
+                        if sel_languages and lang.get("name") not in sel_languages:
+                            continue
                         lang_name = lang.get("name", "Unknown")
                         suggested = lang.get("total_code_lines_suggested", 0)
                         accepted = lang.get("total_code_lines_accepted", 0)

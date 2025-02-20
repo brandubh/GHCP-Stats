@@ -126,7 +126,7 @@ def page1():
         
         # --- Code Metrics ---
         st.subheader("Code Metrics")
-        lang_df = helpers.load_code_metrics(records)
+        lang_df = helpers.load_code_metrics(records, sel_editors, sel_models, sel_languages)
         if lang_df.empty:
             st.info("No code metrics available for selected filters.")
         else:
