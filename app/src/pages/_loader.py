@@ -5,6 +5,8 @@ from datetime import datetime, timedelta
 from utils.import_ghcp import import_metrics
 from utils.helpers import get_data_range
 from dotenv import load_dotenv
+from utils.auth_wrapper import require_auth
+
 
 # Initialize session state for scheduler
 def init_session_state():
@@ -30,11 +32,11 @@ def check_scheduled_import():
         st.session_state['next_scheduled_import'] = now + timedelta(days=1)
         st.rerun()
 
-def main():
+@require_auth
+def loader():
     st.title("GitHub Copilot Statistics")
-    load_dotenv()
     
-    # Initialize session state
+    # Initialize session state for scheduler
     init_session_state()
     
     # Check for scheduled imports
@@ -98,4 +100,4 @@ def main():
             st.success("Database imported successfully!")
             
 if __name__ == "__main__":
-    main()
+    loader()

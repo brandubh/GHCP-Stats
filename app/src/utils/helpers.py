@@ -5,18 +5,7 @@ import json
 from datetime import datetime
 import pandas as pd
 
-def example_helper_function(data):
-    """
-    This function is an example of a utility function that can be used throughout the application.
-    It takes some data as input and performs a specific operation.
-    Replace this with your actual helper functions as needed.
-    """
-    # Perform some data manipulation or formatting here
-    return data
-
-
 # --- Database Setup ---
-load_dotenv()
 
 def get_connection():
     db_name = os.getenv("DB_NAME", "metrics.db")

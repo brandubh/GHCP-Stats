@@ -2,13 +2,10 @@ import requests
 import json
 from dotenv import load_dotenv
 import os
-import streamlit as st  # Add this missing import
-# Change from relative to absolute import
+import streamlit as st
 from utils.helpers import get_connection
+from utils.auth import get_secret
 
-
-
-# --- Backend Import Routine ---
 def import_metrics_for_org(org, token):
     url = f"https://api.github.com/orgs/{org}/copilot/metrics"
     headers = {
@@ -16,12 +13,26 @@ def import_metrics_for_org(org, token):
         "Authorization": f"Bearer {token}",
         "X-GitHub-Api-Version": "2022-11-28"
     }
-    resp = requests.get(url, headers=headers)
-    if resp.status_code == 200:
-        return resp.json()
-    else:
-        st.error(f"Error fetching metrics for {org}: {resp.status_code}")
-        return []
+    metrics = []
+    while url:
+        resp = requests.get(url, headers=headers)
+        if resp.status_code == 200:
+            metrics.extend(resp.json())
+            # Check for pagination
+            if 'Link' in resp.headers:
+                links = resp.headers['Link']
+                next_link = None
+                for link in links.split(','):
+                    if 'rel="next"' in link:
+                        next_link = link[link.find('<') + 1:link.find('>')]
+                        break
+                url = next_link
+            else:
+                url = None
+        else:
+            st.error(f"Error fetching metrics for {org}: {resp.status_code}")
+            break
+    return metrics
 
 def store_metrics(org, metrics):
     conn = get_connection()
@@ -36,9 +47,10 @@ def store_metrics(org, metrics):
     conn.close()
 
 def import_metrics():
-    load_dotenv()
     org_list = [org.strip() for org in os.getenv("ORG_LIST", "").split(",") if org.strip()]
     token = os.getenv("GHCP_TOKEN")
+    if not token:
+        token = get_secret("GHCP_TOKEN")
     if not token:
         st.error("GitHub token not found in .env file.")
         st.stop()

@@ -3,9 +3,11 @@ import utils.helpers as helpers
 from datetime import date, timedelta, datetime
 import pandas as pd
 import altair as alt
+from utils.auth_wrapper import require_auth
 
+@require_auth
 
-def page1():
+def main():
     # Add more components and logic specific to this page here
     # --- Streamlit Frontend ---
     st.title("GitHub Copilot Metrics Dashboard")
@@ -163,4 +165,4 @@ def page1():
             )
 
 if __name__ == "__main__":
-    page1()
+    main()
