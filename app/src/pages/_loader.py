@@ -76,13 +76,6 @@ def loader():
         min_date, max_date = get_data_range()
         st.rerun()
     
-    # Add your Streamlit components here
-    if st.button("Import Data"):
-        import_metrics()
-        # Refresh date range after import
-        min_date, max_date = get_data_range()
-        st.rerun()
-    
     if st.button("Export Database"):
         db_path = os.getenv("DB_NAME", "metrics.db")
         if os.path.exists(db_path):

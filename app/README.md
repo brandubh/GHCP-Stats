@@ -273,3 +273,22 @@ Required environment variables for the application:
 ## Contributing
 
 Feel free to submit issues or pull requests for any improvements or bug fixes.
+
+# TODO
+
+- Inconsistent Import Paths: Some files use relative imports (from utils.helpers) while others use different import styles. Consistency would improve maintainability.
+- Page Naming Convention: Using numeric prefixes (1_charts.py) works but Streamlit now supports a pages/ directory with automatic navigation. Consider standardizing your approach.
+- Duplicate Database Import Button: In _loader.py, you have two "Import Data" buttons that perform the same action.
+- Error Handling: Add more robust error handling around database operations and API calls.
+- Session State Management: Session state variables are scattered across different files. Consider centralizing this logic.
+
+## Recommendations
+
+- Standardize Page Structure: Use a consistent template for all pages with standard imports and authentication requirements.
+- Refactor Authentication Flow: The current authentication implementation seems to have some issues. Consider creating a more robust auth module.
+- Add Documentation: Add docstrings to functions and modules for better code maintainability.
+- Implement Logging: Replace print statements with proper logging to help with debugging.
+- Cache Heavy Operations: Use @st.cache_data or @st.cache_resource decorators for database queries and API calls.
+- Add Tests: Consider adding unit tests for your utility functions and data processing logic.
+- Secrets Management: Use Streamlit's secrets management instead of directly accessing environment variables where possible.
+- Use a Database Abstraction Layer: Consider using an ORM like SQLAlchemy to make database operations more maintainable
