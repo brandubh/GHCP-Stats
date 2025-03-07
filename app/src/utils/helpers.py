@@ -8,23 +8,65 @@ import pandas as pd
 # --- Database Setup ---
 
 def get_connection():
-    db_name = os.getenv("DB_NAME", "metrics.db")
-    conn = sqlite3.connect(db_name, check_same_thread=False)
-    cursor = conn.cursor()
-    cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='metrics'")
-    if not cursor.fetchone():
-        cursor.execute(
-            """
-            CREATE TABLE metrics (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                org TEXT,
-                date TEXT,
-                data TEXT
+    """
+    Get a connection to the SQLite database with improved error handling.
+    Returns a connection object if successful or raises an exception with detailed error info.
+    """
+    try:
+        # Load environment variables if not already loaded
+        load_dotenv()
+        
+        # Get database name from environment variables with fallback
+        db_name = os.getenv("DB_NAME", "metrics.db")
+        
+        # Log current working directory for debugging
+        cwd = os.getcwd()
+        print(f"Current working directory: {cwd}")
+        
+        # Full path to database file
+        db_path = os.path.join(cwd, db_name)
+        
+        # Check if database directory exists
+        db_dir = os.path.dirname(db_path)
+        if db_dir and not os.path.exists(db_dir):
+            os.makedirs(db_dir, exist_ok=True)
+            print(f"Created directory: {db_dir}")
+        
+        # Check if database file exists (will be created if not)
+        file_exists = os.path.isfile(db_path)
+        print(f"Database file '{db_path}' exists: {file_exists}")
+        
+        # Create connection
+        conn = sqlite3.connect(db_path, check_same_thread=False)
+        
+        # Create table if it doesn't exist
+        cursor = conn.cursor()
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='metrics'")
+        if not cursor.fetchone():
+            print(f"Creating metrics table in database: {db_path}")
+            cursor.execute(
+                """
+                CREATE TABLE metrics (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    org TEXT,
+                    date TEXT,
+                    data TEXT
+                )
+                """
             )
-            """
-        )
-        conn.commit()
-    return conn
+            conn.commit()
+            print("Table 'metrics' created successfully")
+        
+        return conn
+    
+    except sqlite3.Error as e:
+        error_msg = f"SQLite error: {str(e)}"
+        print(f"Database connection error: {error_msg}")
+        raise Exception(f"Failed to connect to database: {error_msg}")
+    except Exception as e:
+        error_msg = f"Unexpected error: {str(e)}"
+        print(f"Error in get_connection(): {error_msg}")
+        raise Exception(f"Database connection failed: {error_msg}")
 
 def get_data_range():
     """Get the earliest and latest dates from the metrics database."""

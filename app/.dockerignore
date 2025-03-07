@@ -1,0 +1,9 @@
+.env
+.env.local
+__pycache__/
+*.py[cod]
+*$py.class
+.git
+.github
+.gitignore
+.DS_Store

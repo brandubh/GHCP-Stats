@@ -10,6 +10,30 @@
         },
         "appName": {
             "value": "ghcp-stats"
+        },
+        "acrSku": {
+            "value": "Basic"
+        },
+        "containerPort": {
+            "value": 8501
+        },
+        "acrName": {
+            "value": "ghcpstatsregistry"
+        },
+        "customHostName": {
+            "value": "your-app-name.yourdomain.com"
+        },
+        "useCustomDomain": {
+            "value": false
+        },
+        "frontDoorName": {
+            "value": "ghcp-stats-fd"
+        },
+        "wafPolicyName": {
+            "value": "ghcp-stats-waf"
+        },
+        "enableDefender": {
+            "value": true
         }
     }
 }

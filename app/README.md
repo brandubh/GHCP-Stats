@@ -144,6 +144,8 @@ streamlit run src/app.py
 
 ### 2. Infrastructure Deployment
 
+To be corrected since the deployment flow has changed
+
 1. Create Azure resources using Bicep:
    ```bash
    # Login to Azure
@@ -179,6 +181,15 @@ streamlit run src/app.py
 1. Build the Docker image:
    ```bash
    docker build -t ghcp-stats:latest .
+   # check for vulnerabilities
+   docker scout quickview 
+   docker scout cves local://ghcp-stats:latest
+   docker scout recommendations local://ghcp-stats:latest
+   ```
+
+   It's a good idea to test the image locally
+   ```bash
+   docker run -p 8501:8501 ghcp-stats:latest
    ```
 
 2. Push to Azure Container Registry:

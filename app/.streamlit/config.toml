@@ -1,6 +1,7 @@
 [server]
 enableXsrfProtection = true
 enableCORS = false
+headless = true
 
 [browser]
 gatherUsageStats = false
@@ -14,6 +15,3 @@ font = "sans serif"
 
 [ui]
 hideTopBar = false
-
-[server]
-headless = true

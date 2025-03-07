@@ -6,6 +6,8 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
+# Expose Streamlit port
+EXPOSE 8501
 # Create volume mount point for SQLite database
 VOLUME /app/data
 

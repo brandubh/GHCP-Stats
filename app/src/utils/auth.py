@@ -5,11 +5,39 @@ from msal import ConfidentialClientApplication
 import os
 
 def get_secret(secret_name):
-    """Retrieve secret from Azure KeyVault"""
-    credential = DefaultAzureCredential()
-    vault_url = f"https://{st.secrets['key_vault_name']}.vault.azure.net/"
-    client = SecretClient(vault_url=vault_url, credential=credential)
-    return client.get_secret(secret_name).value
+    """Retrieve secret from Azure KeyVault with local development support"""
+    import os
+    
+
+    
+    # First check if we have a local override (for development)
+    local_secret = os.getenv(secret_name)
+    if local_secret:
+        return local_secret
+    
+    # Transform underscores to hyphens in secret name
+    secret_name_formatted = secret_name.replace("_", "-")
+    # Get Key Vault name from environment or streamlit secrets
+    key_vault_name = os.getenv("KEY_VAULT_NAME")
+    if not key_vault_name:
+        st.error("Key Vault name not found in environment variables or streamlit secrets")
+        return None
+        
+    try:
+        # Use DefaultAzureCredential which supports multiple authentication methods
+        credential = DefaultAzureCredential()
+        vault_url = f"https://{key_vault_name}.vault.azure.net/"
+        client = SecretClient(vault_url=vault_url, credential=credential)
+        return client.get_secret(secret_name_formatted).value
+    except Exception as e:
+        st.warning(f"Could not retrieve secret from Key Vault: {type(e).__name__}")
+        
+        # For local development, fallback to secrets.toml if it exists
+        if hasattr(st, 'secrets') and secret_name in st.secrets:
+            return st.secrets[secret_name]
+        
+        # Final fallback to environment variables with direct name
+        return os.getenv(secret_name)
 
 def init_auth():
     """Initialize authentication"""
@@ -17,14 +45,14 @@ def init_auth():
         st.session_state['token'] = None
     
     # Azure AD B2C details from env or KeyVault
-    client_id = os.getenv("AZURE_CLIENT_ID") or get_secret("AZURE_CLIENT_ID")
+    client_id = os.getenv("AZURE_APP_CLIENT_ID") or get_secret("AZURE_APP_CLIENT_ID")
     client_secret = os.getenv("AZURE_APP_CLIENT_SECRET") or get_secret("AZURE_APP_CLIENT_SECRET")
     tenant_id = os.getenv("AZURE_TENANT_ID") or get_secret("AZURE_TENANT_ID")
     
     authority = f"https://login.microsoftonline.com/{tenant_id}"
     # Get the base URL dynamically
     base_url = os.getenv("REDIRECT_BASE_URL", "http://localhost:8501")
-    redirect_uri = f"{base_url}"  # Remove /oauth2/callback as it's not needed
+    redirect_uri = f"{base_url}"  # Redirect URL for the app
 
     app = ConfidentialClientApplication(
         client_id,

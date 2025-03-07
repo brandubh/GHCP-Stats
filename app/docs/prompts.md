@@ -333,6 +333,15 @@ write a complete python web app using streamlit wit the following components:
   * the number of active users and incative users in the period
   * the number of accpeted lines of code and the % on the suggestions made
 
+# Deployment
+
+Give me a detailed guide to deploy the resulting streamlit solution on Azure, considering the following:
+* a container app should be the first choice
+* persist the data in sqllite database between runs and let it be updated by the scheduled import data tasks
+* use keyvault for the secrets
+* the app must be authenticated using entra id identities. add the required login logic.
+* detail the steps to register the app for authentication on a specific entra id tenant
+
 # Other Prompts
 
 ## Best practices
@@ -371,3 +380,11 @@ Add Tests: Consider adding unit tests for your utility functions and data proces
 Secrets Management: Use Streamlit's secrets management instead of directly accessing environment variables where possible.
 
 Use a Database Abstraction Layer: Consider using an ORM like SQLAlchemy to make database operations more maintainable.
+
+give me a step by step guide to remotely debug a streamlit application deployed in azure ACA from Visual Studio Code. Be prescriptive, include any code or configuration needed
+
+# Timing
+
+working v1 - 2h
+db browsing + authentication - 2h
+deployment on Azire - 
