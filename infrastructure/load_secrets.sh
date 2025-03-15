@@ -1,5 +1,6 @@
     #!/bin/bash
     
+    # set keyvault secrets from .env.local and then sets the minimum required envorinment variables for the container app
     # Source the .env.local file to load environment variables
     source ../app/.env.local
 
@@ -20,9 +21,3 @@
         --name "GHCP-TOKEN" \
         --value "$GHCP_TOKEN"  
    
-   az containerapp update \
-     --name ghcp-stats-app \
-     --resource-group ghcp-stats-prod-rg \
-     --set-env-vars \
-       "KEY_VAULT_NAME=ghcp-stats-kv" \
-       "DB_NAME=./app/data/metrics.db"

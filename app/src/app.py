@@ -2,7 +2,7 @@ import streamlit as st
 import os
 from dotenv import load_dotenv
 from utils.auth_wrapper import require_auth
-from pages._loader import loader
+from utils.__loader import loader
 
 # Configure page settings
 st.set_page_config(

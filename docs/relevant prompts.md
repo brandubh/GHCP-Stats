@@ -1,6 +1,6 @@
 
 # Initial Prompt
-iven the github copilot metrics API:
+Given the github copilot metrics API:
 curl -L \ -H "Accept: application/vnd.github+json" \ -H "Authorization: Bearer <YOUR-TOKEN>" \ -H "X-GitHub-Api-Version: 2022-11-28" \ <https://api.github.com/orgs/ORG/copilot/metrics>
 
 that return the folowing schema:
@@ -323,15 +323,15 @@ that return the folowing schema:
     "additionalProperties": true
   }
 }
-write a complete python web app using streamlit wit the following components:
+write a complete python web app using streamlit with the following components:
 
 * a backend metrics import routine. The routine must append new metrics to a common file or database. The choice is up to you.
 * the backend should take multiple org names and merge all the metrics adding a property to keep track of the org
 * a front end that allows to show the following information:
-  * a slecter for the timeframe for the data to show
+  * a selector for the timeframe for the data to show
   * a selectors for orgs, models, editor and language
   * the number of active users and incative users in the period
-  * the number of accpeted lines of code and the % on the suggestions made
+  * the number of accepted lines of code and the % on the suggestions made
 
 # Deployment
 
@@ -348,7 +348,8 @@ Give me a detailed guide to deploy the resulting streamlit solution on Azure, co
 
 @workspace check my app folder for best practices in a streamlit project
 
-#Answer
+# Answer
+
 Areas for Improvement
 Duplicate Files: You have both 1_charts.py and 1_Charts.py (case difference). This can cause issues on case-insensitive file systems and create confusion.
 
@@ -387,4 +388,6 @@ give me a step by step guide to remotely debug a streamlit application deployed 
 
 working v1 - 2h
 db browsing + authentication - 2h
-deployment on Azire - 
+deployment on Azure - 4h 
+
+tuning azure deployment to include frontdoor, the real issue is the ACA choice, it seems this Azure service deserve some polishing

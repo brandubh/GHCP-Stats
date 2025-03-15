@@ -1,5 +1,5 @@
 param location string = 'italynorth'
-
+param environment string = 'dev'
 // Container registry parameters
 param acrName string = 'ghcpstatsregistry'
 param acrSku string = 'Basic'

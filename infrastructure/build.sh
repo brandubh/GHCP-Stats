@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Read parameters from parameters.prod.json
-ENVIRONMENT_NAME=$(jq -r '.parameters.environmentName.value' parameters.prod.json)
-LOCATION=$(jq -r '.parameters.location.value' parameters.prod.json)
-APP_NAME=$(jq -r '.parameters.appName.value' parameters.prod.json)
-ACR_NAME=$(jq -r '.parameters.acrName.value' parameters.prod.json)
+ENVIRONMENT_NAME=$(jq -r '.parameters.environmentName.value' parameters.main.dev.json)
+LOCATION=$(jq -r '.parameters.location.value' parameters.main.dev.json)
+APP_NAME=$(jq -r '.parameters.appName.value' parameters.main.dev.json)
+ACR_NAME=$(jq -r '.parameters.acrName.value' parameters.main.dev.json)
 
 # Authenticate with ACR
 az acr login --name $ACR_NAME

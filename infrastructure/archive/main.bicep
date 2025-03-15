@@ -27,7 +27,7 @@ param envVars array = [
   }
   {
     name: 'DB_NAME'
-    value: './app/data/metrics.db'
+    value: '/app/data/metrics.db'
   }
   {
     name: 'AZURE_CLIENT_ID'
@@ -37,7 +37,7 @@ param envVars array = [
 
 // Add these parameters
 param frontDoorName string = '${appName}-fd'
-param wafPolicyName string = replace('${appName}wafpolicy', '-', '')
+param wafPolicyName string = '${appName}wafpolicy'
 param frontDoorIpRanges array = [
   '4.213.28.114/31'
   '4.213.81.64/29'
@@ -234,11 +234,6 @@ resource fileShareStorage 'Microsoft.App/managedEnvironments/storages@2023-05-01
       accessMode: 'ReadWrite'
     }
   }
-  // Add explicit dependencies to make sure the storage account and file share are ready
-  dependsOn: [
-    fileShare
-    storageAccount
-  ]
 }
 
 // Container App that uses the Azure File storage
@@ -328,10 +323,6 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
       ]
     }
   }
-  // Add explicit dependency on fileShareStorage to ensure it's ready before the container app deploys
-  dependsOn: [
-    fileShareStorage
-  ]
 }
 
 // Add Front Door WAF Policy - FIXED
@@ -370,7 +361,7 @@ resource frontDoorEndpoint 'Microsoft.Cdn/profiles/afdEndpoints@2021-06-01' = {
   }
 }
 
-// Fixed Front Door Origin Group with better naming and properties
+// Add Front Door Origin Group
 resource frontDoorOriginGroup 'Microsoft.Cdn/profiles/originGroups@2021-06-01' = {
   parent: frontDoorProfile
   name: '${appName}-origin-group'
@@ -389,7 +380,7 @@ resource frontDoorOriginGroup 'Microsoft.Cdn/profiles/originGroups@2021-06-01' =
   }
 }
 
-// Fixed Front Door Origin with proper configuration
+// Add Front Door Origin (pointing to Container App)
 resource frontDoorOrigin 'Microsoft.Cdn/profiles/originGroups/origins@2021-06-01' = {
   parent: frontDoorOriginGroup
   name: '${appName}-origin'
@@ -401,11 +392,10 @@ resource frontDoorOrigin 'Microsoft.Cdn/profiles/originGroups/origins@2021-06-01
     priority: 1
     weight: 1000
     enabledState: 'Enabled'
-    enforceCertificateNameCheck: true
   }
 }
 
-// Fixed Front Door Route with explicit dependencies
+// Add Front Door Route
 resource frontDoorRoute 'Microsoft.Cdn/profiles/afdEndpoints/routes@2021-06-01' = {
   parent: frontDoorEndpoint
   name: '${appName}-route'
@@ -424,10 +414,11 @@ resource frontDoorRoute 'Microsoft.Cdn/profiles/afdEndpoints/routes@2021-06-01' 
     linkToDefaultDomain: 'Enabled'
     httpsRedirect: 'Enabled'
     enabledState: 'Enabled'
+    // Remove this reference to avoid circular dependency
+    // securityPolicy: {
+    //   id: frontDoorSecurityPolicy.id
+    // }
   }
-  dependsOn: [
-    frontDoorOrigin // Explicitly depend on the origin to ensure it exists
-  ]
 }
 
 // Add Front Door Security Policy with WAF
@@ -466,9 +457,3 @@ output containerAppFqdn string = containerApp.properties.configuration.ingress.f
 output frontDoorHostname string = frontDoorEndpoint.properties.hostName
 output frontDoorId string = frontDoorProfile.properties.frontDoorId
 output containerAppId string = containerApp.name
-
-// At the end of your file, add these output variables to help with troubleshooting:
-
-output originGroupId string = frontDoorOriginGroup.id
-output originId string = frontDoorOrigin.id
-output containerAppUrl string = 'https://${containerApp.properties.configuration.ingress.fqdn}'

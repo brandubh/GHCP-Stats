@@ -1,20 +1,20 @@
 param location string = 'italynorth'
 param appName string = 'ghcp-stats'
-param environmentName string = 'dev'
+param environmentName string = 'prod'
 
 // Container registry parameters
 param acrName string = 'ghcpstatsregistry'
 param acrSku string = 'Basic'
 
 // Key vault parameters
-param keyVaultName string = 'ghcp-stats-kv-${environmentName}'
+param keyVaultName string = 'ghcp-stats-kv'
 
 // Storage account parameters
 param storageAccountName string = 'ghcpstatsstorage'
-param fileShareName string = 'ghcpstatsdata${environmentName}'
+param fileShareName string = 'ghcpstatsdata'
 
 // Container app parameters
-param containerAppName string = 'ghcp-stats-app-${environmentName}'
+param containerAppName string = 'ghcp-stats-app'
 param containerImage string = '${acrName}.azurecr.io/ghcp-stats:latest'
 param containerPort int = 8501
 param containerCpu string = '0.5'
@@ -27,97 +27,14 @@ param envVars array = [
   }
   {
     name: 'DB_NAME'
-    value: './app/data/metrics.db'
-  }
-  {
-    name: 'AZURE_CLIENT_ID'
-    secretRef: 'app-client-id'
+    value: '/app/data/metrics.db'
   }
 ]
 
 // Add these parameters
 param frontDoorName string = '${appName}-fd'
-param wafPolicyName string = replace('${appName}wafpolicy', '-', '')
-param frontDoorIpRanges array = [
-  '4.213.28.114/31'
-  '4.213.81.64/29'
-  '4.232.98.120/29'
-  '13.73.248.16/29'
-  '20.17.126.64/29'
-  '20.21.37.40/29'
-  '20.36.120.104/29'
-  '20.37.64.104/29'
-  '20.37.156.120/29'
-  '20.37.195.0/29'
-  '20.37.224.104/29'
-  '20.38.84.72/29'
-  '20.38.136.104/29'
-  '20.39.11.8/29'
-  '20.41.4.88/29'
-  '20.41.64.120/29'
-  '20.41.192.104/29'
-  '20.42.4.120/29'
-  '20.42.129.152/29'
-  '20.42.224.104/29'
-  '20.43.41.136/29'
-  '20.43.65.128/29'
-  '20.43.130.80/29'
-  '20.45.112.104/29'
-  '20.45.192.104/29'
-  '20.59.103.64/29'
-  '20.72.18.248/29'
-  '20.79.107.152/29'
-  '20.88.157.176/29'
-  '20.90.132.152/29'
-  '20.113.254.88/29'
-  '20.115.247.64/29'
-  '20.118.195.128/29'
-  '20.119.155.128/29'
-  '20.150.160.96/29'
-  '20.189.106.112/29'
-  '20.192.161.104/29'
-  '20.192.225.48/29'
-  '20.210.70.64/30'
-  '20.215.4.240/29'
-  '20.217.44.240/29'
-  '40.67.48.104/29'
-  '40.74.30.72/29'
-  '40.80.56.104/29'
-  '40.80.168.104/29'
-  '40.80.184.120/29'
-  '40.82.248.248/29'
-  '40.89.16.104/29'
-  '51.12.41.8/29'
-  '51.12.193.8/29'
-  '51.53.30.144/29'
-  '51.104.25.128/29'
-  '51.105.80.104/29'
-  '51.105.88.104/29'
-  '51.107.48.104/29'
-  '51.107.144.104/29'
-  '51.120.40.104/29'
-  '51.120.224.104/29'
-  '51.137.160.112/29'
-  '51.143.192.104/29'
-  '52.136.48.104/29'
-  '52.140.104.104/29'
-  '52.150.136.120/29'
-  '52.159.71.160/29'
-  '52.228.80.120/29'
-  '68.210.172.176/29'
-  '68.221.93.128/29'
-  '69.15.0.0/16'
-  '102.133.56.88/29'
-  '102.133.216.88/29'
-  '147.243.0.0/16'
-  '157.55.93.2/31'
-  '158.23.108.56/29'
-  '172.204.165.112/29'
-  '172.207.68.70/31'
-  '172.207.69.80/30'
-  '191.233.9.120/29'
-  '191.235.225.128/29'
-]
+param wafPolicyName string = '${appName}-wafpolicy'
+param enableDefender bool = true
 
 // Log Analytics for Container Apps Environment
 resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
@@ -234,11 +151,6 @@ resource fileShareStorage 'Microsoft.App/managedEnvironments/storages@2023-05-01
       accessMode: 'ReadWrite'
     }
   }
-  // Add explicit dependencies to make sure the storage account and file share are ready
-  dependsOn: [
-    fileShare
-    storageAccount
-  ]
 }
 
 // Container App that uses the Azure File storage
@@ -256,21 +168,12 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
     configuration: {
       ingress: {
         external: true
-        targetPort: containerPort
-        allowInsecure: false
-        traffic: [
-          {
-            weight: 100
-            latestRevision: true
-          }
-        ]
-        // Use access restrictions correctly for Front Door
-
+        targetPort: containerPort // Use the containerPort parameter instead of hardcoded 80
+        // Add Front Door integration
         ipSecurityRestrictions: [
-          for ipRange in frontDoorIpRanges: {
-            name: 'AllowAzureFrontDoor_${replace(ipRange, '/', '_')}'
-            description: 'Allow traffic from Azure Front Door IP range ${ipRange}'
-            ipAddressRange: ipRange
+          {
+            name: 'Allow-FrontDoor-Only'
+            ipAddressRange: 'AzureFrontDoor.Backend'
             action: 'Allow'
           }
         ]
@@ -288,11 +191,11 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
           value: acr.listCredentials().passwords[0].value
         }
         {
-          name: 'app-client-id'
+          name: 'app-client-id' // Add the missing secret
           value: containerAppIdentity.properties.clientId
         }
         {
-          name: 'tenant-id'
+          name: 'tenant-id' // Add the missing secret
           value: subscription().tenantId
         }
       ]
@@ -300,12 +203,12 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
     template: {
       containers: [
         {
-          name: containerAppName
-          image: containerImage
+          name: containerAppName // Use the containerAppName parameter
+          image: containerImage // Use the containerImage parameter
           env: envVars
           resources: {
-            cpu: json('${containerCpu}')
-            memory: containerMemory
+            cpu: json('${containerCpu}') // Use the containerCpu parameter
+            memory: containerMemory // Use the containerMemory parameter
           }
           volumeMounts: [
             {
@@ -328,14 +231,10 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
       ]
     }
   }
-  // Add explicit dependency on fileShareStorage to ensure it's ready before the container app deploys
-  dependsOn: [
-    fileShareStorage
-  ]
 }
 
-// Add Front Door WAF Policy - FIXED
-resource wafPolicy 'Microsoft.Network/frontdoorwebapplicationfirewallpolicies@2024-02-01' = {
+// Add Front Door WAF Policy
+resource wafPolicy 'Microsoft.Network/frontdoorwebapplicationfirewallpolicies@2022-05-01' = {
   name: wafPolicyName
   location: 'global'
   sku: {
@@ -346,10 +245,22 @@ resource wafPolicy 'Microsoft.Network/frontdoorwebapplicationfirewallpolicies@20
       enabledState: 'Enabled'
       mode: 'Prevention'
     }
+    managedRules: {
+      managedRuleSets: [
+        {
+          ruleSetType: 'DefaultRuleSet'
+          ruleSetVersion: '1.0'
+          ruleGroupOverrides: []
+        }
+        {
+          ruleSetType: 'Microsoft_BotManagerRuleSet'
+          ruleSetVersion: '1.0'
+          ruleGroupOverrides: []
+        }
+      ]
+    }
   }
 }
-
-output wafPolicyId string = wafPolicy.id
 
 // Add Azure Front Door Profile
 resource frontDoorProfile 'Microsoft.Cdn/profiles@2021-06-01' = {
@@ -370,7 +281,7 @@ resource frontDoorEndpoint 'Microsoft.Cdn/profiles/afdEndpoints@2021-06-01' = {
   }
 }
 
-// Fixed Front Door Origin Group with better naming and properties
+// Add Front Door Origin Group
 resource frontDoorOriginGroup 'Microsoft.Cdn/profiles/originGroups@2021-06-01' = {
   parent: frontDoorProfile
   name: '${appName}-origin-group'
@@ -389,7 +300,7 @@ resource frontDoorOriginGroup 'Microsoft.Cdn/profiles/originGroups@2021-06-01' =
   }
 }
 
-// Fixed Front Door Origin with proper configuration
+// Add Front Door Origin (pointing to Container App)
 resource frontDoorOrigin 'Microsoft.Cdn/profiles/originGroups/origins@2021-06-01' = {
   parent: frontDoorOriginGroup
   name: '${appName}-origin'
@@ -401,11 +312,10 @@ resource frontDoorOrigin 'Microsoft.Cdn/profiles/originGroups/origins@2021-06-01
     priority: 1
     weight: 1000
     enabledState: 'Enabled'
-    enforceCertificateNameCheck: true
   }
 }
 
-// Fixed Front Door Route with explicit dependencies
+// Add Front Door Route
 resource frontDoorRoute 'Microsoft.Cdn/profiles/afdEndpoints/routes@2021-06-01' = {
   parent: frontDoorEndpoint
   name: '${appName}-route'
@@ -424,21 +334,20 @@ resource frontDoorRoute 'Microsoft.Cdn/profiles/afdEndpoints/routes@2021-06-01' 
     linkToDefaultDomain: 'Enabled'
     httpsRedirect: 'Enabled'
     enabledState: 'Enabled'
+    securityPolicy: {
+      id: frontDoorSecurityPolicy.id
+    }
   }
-  dependsOn: [
-    frontDoorOrigin // Explicitly depend on the origin to ensure it exists
-  ]
 }
 
 // Add Front Door Security Policy with WAF
-resource frontDoorSecurityPolicy 'Microsoft.Cdn/profiles/securityPolicies@2024-02-01' = {
+resource frontDoorSecurityPolicy 'Microsoft.Cdn/profiles/securityPolicies@2021-06-01' = {
   parent: frontDoorProfile
   name: '${appName}-security-policy'
   properties: {
     parameters: {
       type: 'WebApplicationFirewall'
       wafPolicy: {
-        // Use subscription and resource group in the resource ID for complete path
         id: wafPolicy.id
       }
       associations: [
@@ -455,20 +364,45 @@ resource frontDoorSecurityPolicy 'Microsoft.Cdn/profiles/securityPolicies@2024-0
       ]
     }
   }
-  // Add explicit dependency to ensure WAF policy exists first
-  dependsOn: [
-    wafPolicy
-  ]
 }
 
-// Add output values for deploy.sh
-output containerAppFqdn string = containerApp.properties.configuration.ingress.fqdn
-output frontDoorHostname string = frontDoorEndpoint.properties.hostName
-output frontDoorId string = frontDoorProfile.properties.frontDoorId
-output containerAppId string = containerApp.name
+// Configure Microsoft Defender (Azure Defender)
+resource defenderForContainerApps 'Microsoft.Security/pricings@2023-01-01' = if (enableDefender) {
+  name: 'ContainerRegistry'
+  properties: {
+    pricingTier: 'Standard'
+  }
+}
 
-// At the end of your file, add these output variables to help with troubleshooting:
+resource defenderForKeyVault 'Microsoft.Security/pricings@2023-01-01' = if (enableDefender) {
+  name: 'KeyVaults'
+  properties: {
+    pricingTier: 'Standard'
+  }
+}
 
-output originGroupId string = frontDoorOriginGroup.id
-output originId string = frontDoorOrigin.id
-output containerAppUrl string = 'https://${containerApp.properties.configuration.ingress.fqdn}'
+resource defenderForStorageAccounts 'Microsoft.Security/pricings@2023-01-01' = if (enableDefender) {
+  name: 'StorageAccounts'
+  properties: {
+    pricingTier: 'Standard'
+  }
+}
+
+resource defenderForContainers 'Microsoft.Security/pricings@2023-01-01' = if (enableDefender) {
+  name: 'Containers'
+  properties: {
+    pricingTier: 'Standard'
+  }
+}
+
+// Add auto-provisioning of the monitoring agent
+resource autoProvisioningSettings 'Microsoft.Security/autoProvisioningSettings@2017-08-01-preview' = if (enableDefender) {
+  name: 'default'
+  properties: {
+    autoProvision: 'On'
+  }
+}
+
+// Add outputs for the Front Door endpoint
+output frontDoorEndpointUrl string = 'https://${frontDoorEndpoint.properties.hostName}'
+output containerAppDirectUrl string = 'https://${containerApp.properties.configuration.ingress.fqdn}'
