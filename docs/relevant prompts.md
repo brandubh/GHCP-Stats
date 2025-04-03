@@ -384,10 +384,6 @@ Use a Database Abstraction Layer: Consider using an ORM like SQLAlchemy to make 
 
 give me a step by step guide to remotely debug a streamlit application deployed in azure ACA from Visual Studio Code. Be prescriptive, include any code or configuration needed
 
-# Timing
 
-working v1 - 2h
-db browsing + authentication - 2h
-deployment on Azure - 4h 
 
 tuning azure deployment to include frontdoor, the real issue is the ACA choice, it seems this Azure service deserve some polishing
