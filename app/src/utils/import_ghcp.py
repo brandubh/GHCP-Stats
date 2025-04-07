@@ -47,6 +47,10 @@ def store_metrics(org, metrics):
     conn.close()
 
 def import_metrics():
+    # TODO: if running on Azure copy the datbase file from persistent storage to the local storage
+    # and then copy it back to the persistent storage after the import
+    # the database file is stored in the DB_NAME environment variable
+    # the persistent storage is stored in the PERSISTENT_STORAGE environment variable
     org_list = [org.strip() for org in os.getenv("ORG_LIST", "").split(",") if org.strip()]
     token = os.getenv("GHCP_TOKEN")
     if not token:
