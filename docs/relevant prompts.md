@@ -344,13 +344,11 @@ Give me a detailed guide to deploy the resulting streamlit solution on Azure, co
 * the app must be authenticated using entra id identities. add the required login logic.
 * detail the steps to register the app for authentication on a specific entra id tenant
 
-# Other Prompts
-
-## Best practices
+# Best practices
 
 @workspace check my app folder for best practices in a streamlit project
 
-# Answer
+## Answer
 
 Areas for Improvement
 Duplicate Files: You have both 1_charts.py and 1_Charts.py (case difference). This can cause issues on case-insensitive file systems and create confusion.
@@ -394,7 +392,7 @@ deployment on Azure - 4h
 
 tuning azure deployment to include frontdoor, the real issue is the ACA choice, it seems this Azure service deserve some polishing
 
-## Workaournd for the SQLLite bug with Azure File Share
+# Workaournd for the SQLLite bug with Azure File Share
 
 The current implementation of SQLLite whem implemented in Azure ACA with Azure File Share as permamnt storage doesn't work. SQLLite is not supported in such an environment.
 I want you to edit the code to:
@@ -412,7 +410,7 @@ Sonnet 3.7 has a more comprehensive approach, taking into consideration Azure an
 
 _I want you to REWRITE the following prompt optimizing it for Github Copilot:_
 
-### Prompt rewritten by Sonnet 3.7
+## Prompt rewritten by Sonnet 3.7
 
 /**
 
@@ -445,7 +443,7 @@ _I want you to REWRITE the following prompt optimizing it for Github Copilot:_
 * * METRICS_DB_FILENAME: Optional filename for the database (default: "metrics.db")
  */
 
-### Prompt rewritten by GPT4-o
+## Prompt rewritten by GPT4-o
 
  Here’s the rewritten prompt optimized for GitHub Copilot:
 
@@ -460,7 +458,7 @@ Save changes: After the import, copy the updated metrics.db back to the Azure Fi
 Environment variables: Add or modify any required environment variables to support this functionality.
 Ensure the code is efficient, handles errors gracefully, and adheres to Python best practices.
 
-### Prompt rewritten by Gemini 2.0
+## Prompt rewritten by Gemini 2.0
 
 The current application uses SQLite for its metrics database, which is stored on an Azure File Share for persistent storage within an Azure Container Apps (ACA) environment. This setup is known to be problematic due to SQLite's file locking mechanisms not being well-suited for network file systems.
 
@@ -479,7 +477,7 @@ Code Changes: Provide the code modifications necessary to implement these steps 
 Testing: Provide a basic test case to verify that the database is correctly synchronized with the Azure File Share after importing metrics.
 Please provide the modified import_metrics function, any necessary helper functions, and the updated environment variable definition. Ensure the solution adheres to the provided coding guidelines, including type annotations, docstrings, and error handling.
 
-### Prompt rewritten by 03-mini
+## Prompt rewritten by 03-mini
 
 The current implementation of SQLite in Azure ACA—with Azure File Share as persistent storage—fails because SQLite isn’t supported in this environment. Please update the code so that when the function import_metrics is invoked, it does the following:
 
@@ -488,6 +486,6 @@ Imports the metrics from the acquired database.
 Copies the updated metrics.db back to the Azure File Share.
 Also, adjust or add any necessary environment variables to support these changes.
 
-### Prompt rewritten by o1
+## Prompt rewritten by o1
 
 Filtered by Responsible AI Service (sigh)
