@@ -12,9 +12,9 @@ NODE_ENV=production
 LOG_LEVEL=info
 
 # Database Configuration
-MONGODB_URI=mongodb://username:password@hostname:port/database
-CLICKHOUSE_URL=https://username:password@hostname:port
-REDIS_URL=redis://username:password@hostname:port
+DB_NAME=your_database_name
+PERSISTENT_STORAGE=azure_key_vault
+AZURE_KEY_VAULT_URI=https://your-key-vault-name.vault.azure.net/
 
 # GitHub Integration
 GITHUB_CLIENT_ID=your_github_client_id
