@@ -432,19 +432,18 @@ write a complete python web app using streamlit with the following components:
 # Deployment
 
 Give me a detailed guide to deploy the resulting streamlit solution on Azure, considering the following:
+
 - a container app should be the first choice
 - persist the data in sqllite database between runs and let it be updated by the scheduled import data tasks
 - use keyvault for the secrets
 - the app must be authenticated using entra id identities. add the required login logic.
 - detail the steps to register the app for authentication on a specific entra id tenant
 
-# Other Prompts
-
-## Best practices
+# Best practices
 
 @workspace check my app folder for best practices in a streamlit project
 
-# Answer
+## Answer
 
 Areas for Improvement
 Duplicate Files: You have both 1_charts.py and 1_Charts.py (case difference). This can cause issues on case-insensitive file systems and create confusion.
@@ -481,3 +480,101 @@ Use a Database Abstraction Layer: Consider using an ORM like SQLAlchemy to make 
 give me a step by step guide to remotely debug a streamlit application deployed in azure ACA from Visual Studio Code. Be prescriptive, include any code or configuration needed
 
 tuning azure deployment to include frontdoor, the real issue is the ACA choice, it seems this Azure service deserve some polishing
+
+# Workaournd for the SQLLite bug with Azure File Share
+
+The current implementation of SQLLite whem implemented in Azure ACA with Azure File Share as permamnt storage doesn't work. SQLLite is not supported in such an environment.
+I want you to edit the code to:
+
+* every time the import_metrics is called it first get a copy of the metrics.db from the azure file share persistent storage. use an environment variable to track this location
+* import the metrics in the db
+* copy back the metrics.db to file storage
+if needed add or chnage the environemnt avriables required.
+
+1st try with only import_ghcp.py in scope
+1nd try with also helpers.py in scope
+
+GPT-4o has different behavior based on context and implements the entire logic in helper.py not taking into consideration the need of local run.
+Sonnet 3.7 has a more comprehensive approach, taking into consideration Azure and non Azure environments
+
+_I want you to REWRITE the following prompt optimizing it for Github Copilot:_
+
+## Prompt rewritten by Sonnet 3.7
+
+/**
+
+* PROBLEM:
+* SQLite doesn't work properly in Azure Container Apps (ACA) with Azure File Share as persistent storage
+* due to file locking and concurrent access issues.
+*
+* TASK:
+* Modify the import_metrics function to implement a "copy-work-save" pattern:
+*
+* 1. Copy metrics.db from Azure File Share to local container storage
+* 2. Perform database operations locally
+* 3. Copy the updated database back to Azure File Share
+*
+* REQUIREMENTS:
+* * Use environment variable (AZ_FILE_SHARE_PATH) to locate the persistent storage
+* * Handle cases where the database doesn't exist yet
+* * Add proper error handling and logging
+* * Ensure atomic operations to prevent data corruption
+* * Add type hints and documentation
+*
+* IMPLEMENTATION DETAILS:
+* * Use tempfile for secure temporary storage
+* * Use shutil.copy2 to preserve file metadata
+* * Properly close database connections
+* * Handle race conditions
+*
+* ENVIRONMENT VARIABLES:
+* * AZ_FILE_SHARE_PATH: Path to the mounted Azure File Share
+* * METRICS_DB_FILENAME: Optional filename for the database (default: "metrics.db")
+ */
+
+## Prompt rewritten by GPT4-o
+
+ Here’s the rewritten prompt optimized for GitHub Copilot:
+
+Prompt:
+The current implementation of SQLite does not work when deployed in Azure Container Apps (ACA) with Azure File Share as persistent storage because SQLite is not supported in such an environment.
+
+Update the code to achieve the following:
+
+Fetch the database: Before calling import_metrics, retrieve a copy of metrics.db from the Azure File Share persistent storage. Use an environment variable to specify the file share location.
+Import metrics: Perform the metrics import operation using the retrieved database.
+Save changes: After the import, copy the updated metrics.db back to the Azure File Share persistent storage.
+Environment variables: Add or modify any required environment variables to support this functionality.
+Ensure the code is efficient, handles errors gracefully, and adheres to Python best practices.
+
+## Prompt rewritten by Gemini 2.0
+
+The current application uses SQLite for its metrics database, which is stored on an Azure File Share for persistent storage within an Azure Container Apps (ACA) environment. This setup is known to be problematic due to SQLite's file locking mechanisms not being well-suited for network file systems.
+
+I need you to modify the import_metrics function to ensure data integrity and persistence in this environment. Specifically:
+
+Environment Variable: Introduce a new environment variable, AZURE_FILE_SHARE_METRICS_PATH, to store the full path to the metrics.db file on the Azure File Share. If it doesn't exist, create it.
+Database Synchronization: Before importing metrics, the import_metrics function must:
+Copy the metrics.db file from the Azure File Share (specified by AZURE_FILE_SHARE_METRICS_PATH) to a local temporary directory.
+If the file doesn't exist in the Azure File Share, create an empty SQLite database locally.
+Import Metrics: Proceed with the existing logic to import the new metrics into the local SQLite database.
+Database Upload: After successfully importing the metrics, the import_metrics function must:
+Copy the updated metrics.db file from the local temporary directory back to the Azure File Share location specified by AZURE_FILE_SHARE_METRICS_PATH.
+Error Handling: Implement robust error handling to catch potential exceptions during file copy operations and database interactions. Log any errors encountered.
+Temporary Directory: Use the tempfile module to create a secure temporary directory for the local database operations. Ensure this directory is cleaned up after the function completes, regardless of success or failure.
+Code Changes: Provide the code modifications necessary to implement these steps within the import_metrics function. Include necessary imports and error handling.
+Testing: Provide a basic test case to verify that the database is correctly synchronized with the Azure File Share after importing metrics.
+Please provide the modified import_metrics function, any necessary helper functions, and the updated environment variable definition. Ensure the solution adheres to the provided coding guidelines, including type annotations, docstrings, and error handling.
+
+## Prompt rewritten by 03-mini
+
+The current implementation of SQLite in Azure ACA—with Azure File Share as persistent storage—fails because SQLite isn’t supported in this environment. Please update the code so that when the function import_metrics is invoked, it does the following:
+
+Retrieves a copy of metrics.db from the Azure File Share (using an environment variable to specify its location).
+Imports the metrics from the acquired database.
+Copies the updated metrics.db back to the Azure File Share.
+Also, adjust or add any necessary environment variables to support these changes.
+
+## Prompt rewritten by o1
+
+Filtered by Responsible AI Service (sigh)
