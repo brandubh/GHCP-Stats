@@ -426,7 +426,7 @@ write a complete python web app using streamlit with the following components:
 - a front end that allows to show the following information:
   - a selector for the timeframe for the data to show
   - a selectors for orgs, models, editor and language
-  - the number of active users and incative users in the period
+  - the number of active users and inactive users in the period
   - the number of accepted lines of code and the % on the suggestions made
 
 # Deployment
