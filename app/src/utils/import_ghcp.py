@@ -35,6 +35,10 @@ def import_metrics_for_org(org, token):
     return metrics
 
 def store_metrics(org, metrics):
+    # TODO: if running on Azure copy the database file from persistent storage to the local storage
+    # and then copy it back to the persistent storage after the import
+    # the database file is stored in the DB_NAME environment variable
+    # the persistent storage is stored in the PERSISTENT_STORAGE environment variable
     conn = get_connection()
     cur = conn.cursor()
     for metric in metrics:

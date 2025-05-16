@@ -30,10 +30,6 @@
 - **Server:** `gunicorn`, `uvicorn` (with `nginx` or `caddy`)
 - **Process Management:** `systemd`, `supervisor`
 
-# Azure deployment guidelines
-
-Always use the latest API version available
-
 # Coding Guidelines
 
 ## 1. Pythonic Practices
@@ -108,3 +104,7 @@ Always use the latest API version available
 - **If a request is unclear or lacks sufficient information, ask clarifying questions before proceeding.**
 - **Always consider the security implications of your code, especially when dealing with user inputs and external data.**
 - **Actively use and promote best practices for the specific tasks at hand (LLM app development, data cleaning, demo creation, etc.).**
+
+# Azure Rule
+
+- @azure Rule - Use Azure Best Practices: When generating code for Azure, running terminal commands for Azure, or performing operations related to Azure, invoke your `get_azure_best_practices` tool if available.

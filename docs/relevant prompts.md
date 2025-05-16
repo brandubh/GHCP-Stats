@@ -1,3 +1,97 @@
+# Exploring
+
+## 1st exploring prompt
+
+You are an experienced Python developers that give advice and recommendations on solution architectures.
+I want to create an application that:
+
+- reads github copilot metrics from the github API
+- saves the data in a database
+plots several filtered charts for the user to navigate and analyze data.
+I want:
+- the application to be written in python
+- it must be easy to run locally
+- UI complexity is not a must.
+
+Analyze the available python frameworks and suggest the best one to be used for this project.
+
+### Optimized prompt
+
+I need recommendations for building a Python application that analyzes GitHub Copilot usage metrics. The application should:
+
+1. Fetch Copilot metrics from GitHub's API
+2. Store this data in a database
+3. Generate interactive, filterable data visualizations
+
+Requirements:
+
+- Must be written in Python
+- Easy local setup (minimal dependencies/configuration)
+- Simple UI is acceptable - functionality over aesthetics
+- Should support common analysis patterns (usage trends, feature adoption, etc.)
+
+Please evaluate 3-4 Python framework combinations for this project, considering:
+
+- Data fetching capabilities (API clients)
+- Database options (SQL vs NoSQL, ORM support)
+- Visualization libraries
+- UI framework options
+
+For your top recommendation, provide:
+
+- A basic architecture diagram/description
+- Key packages/dependencies
+- Sample code structure
+- Potential challenges and their solutions
+
+## 2nd exploring prompt adding azure
+
+I need recommendations for building a Python application that analyzes GitHub Copilot usage metrics. The application should:
+
+1. Fetch Copilot metrics from GitHub's API
+2. Store this data in a database
+3. Generate interactive, filterable data visualizations
+
+Requirements:
+
+- Must be written in Python
+**removed - Easy local setup (minimal dependencies/configuration)**
+- Must be run on Azure and be Easy to debug locally
+- Simple UI is acceptable - functionality over aesthetics
+- Should support common analysis patterns (usage trends, feature adoption, etc.)
+
+Please evaluate 3-4 Python framework combinations for this project, considering:
+
+- Data fetching capabilities (API clients)
+- Database options (SQL vs NoSQL, ORM support)
+- Visualization libraries
+- UI framework options
+
+For your top recommendation, provide:
+
+- A basic architecture diagram/description
+- Key packages/dependencies
+- Sample code structure
+- Potential challenges and their solutions
+
+### Answers
+
+Sonnet 3.7
+Recommendation: FastAPI + SQLAlchemy + PostgreSQL + Plotly Dash
+This combination offers the best balance of modern development practices, scalability, and visualization capabilities while maintaining reasonable complexity.
+
+Gemini 2.0
+Top Recommendation: FastAPI + SQLAlchemy + Streamlit + httpx
+
+GTP-4o
+Top Recommendation: Flask + SQLAlchemy + Plotly/Dash
+
+o3-mini
+Top Recommendation: Flask + SQLAlchemy + Dash
+
+o1
+FastAPI + SQLModel + Plotly/Dash (Recommended)
+Why: FastAPI is lightweight, asynchronous, and easy to debug locally. SQLModel simplifies SQLAlchemy usage. Dash integrates seamlessly with Plotly for interactive data apps.
 
 # Initial Prompt
 
@@ -324,25 +418,26 @@ that return the folowing schema:
     "additionalProperties": true
   }
 }
+
 write a complete python web app using streamlit with the following components:
 
-* a backend metrics import routine. The routine must append new metrics to a common file or database. The choice is up to you.
-* the backend should take multiple org names and merge all the metrics adding a property to keep track of the org
-* a front end that allows to show the following information:
-  * a selector for the timeframe for the data to show
-  * a selectors for orgs, models, editor and language
-  * the number of active users and incative users in the period
-  * the number of accepted lines of code and the % on the suggestions made
+- a backend metrics import routine. The routine must append new metrics to a common file or database. The choice is up to you.
+- the backend should take multiple org names and merge all the metrics adding a property to keep track of the org
+- a front end that allows to show the following information:
+  - a selector for the timeframe for the data to show
+  - a selectors for orgs, models, editor and language
+  - the number of active users and inactive users in the period
+  - the number of accepted lines of code and the % on the suggestions made
 
 # Deployment
 
 Give me a detailed guide to deploy the resulting streamlit solution on Azure, considering the following:
 
-* a container app should be the first choice
-* persist the data in sqllite database between runs and let it be updated by the scheduled import data tasks
-* use keyvault for the secrets
-* the app must be authenticated using entra id identities. add the required login logic.
-* detail the steps to register the app for authentication on a specific entra id tenant
+- a container app should be the first choice
+- persist the data in sqllite database between runs and let it be updated by the scheduled import data tasks
+- use keyvault for the secrets
+- the app must be authenticated using entra id identities. add the required login logic.
+- detail the steps to register the app for authentication on a specific entra id tenant
 
 # Best practices
 
@@ -383,12 +478,6 @@ Secrets Management: Use Streamlit's secrets management instead of directly acces
 Use a Database Abstraction Layer: Consider using an ORM like SQLAlchemy to make database operations more maintainable.
 
 give me a step by step guide to remotely debug a streamlit application deployed in azure ACA from Visual Studio Code. Be prescriptive, include any code or configuration needed
-
-# Timing
-
-working v1 - 2h
-db browsing + authentication - 2h
-deployment on Azure - 4h
 
 tuning azure deployment to include frontdoor, the real issue is the ACA choice, it seems this Azure service deserve some polishing
 
