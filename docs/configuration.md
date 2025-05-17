@@ -5,6 +5,7 @@
 GHCP-Stats uses environment variables for configuration settings. These should be set in the deployment environment or in a `.env` file during development.
 
 ### Core Configuration
+
 ```
 # Server Configuration
 PORT=3000
@@ -13,7 +14,7 @@ LOG_LEVEL=info
 
 # Database Configuration
 DB_NAME=your_database_name
-PERSISTENT_STORAGE=azure_key_vault
+PERSISTENT_STORAGE=mounted volume
 AZURE_KEY_VAULT_URI=https://your-key-vault-name.vault.azure.net/
 
 # GitHub Integration
@@ -33,6 +34,7 @@ ENABLE_PREDICTIVE_MODELS=false
 ```
 
 ### Advanced Configuration
+
 ```
 # Performance Tuning
 MAX_CONCURRENT_REQUESTS=100
@@ -63,6 +65,7 @@ TLS_KEY_PATH=/path/to/key.pem
 In addition to environment variables, the system uses configuration files for more complex settings.
 
 ### `config/data-collection.json`
+
 This file controls what data is collected and how it's processed:
 
 ```json
@@ -107,6 +110,7 @@ This file controls what data is collected and how it's processed:
 ```
 
 ### `config/metrics.json`
+
 This file defines the metrics calculated by the system:
 
 ```json
@@ -155,6 +159,7 @@ This file defines the metrics calculated by the system:
 ```
 
 ### `config/dashboard.json`
+
 This file configures the dashboard layouts and visualizations:
 
 ```json
@@ -215,7 +220,8 @@ This file configures the dashboard layouts and visualizations:
 When deploying GHCP-Stats, the following parameters should be configured based on the target environment:
 
 ### Production Deployment
-- **Scaling Parameters**: 
+
+- **Scaling Parameters**:
   - Minimum of 3 application instances for high availability
   - Auto-scaling based on CPU utilization (target: 70%)
   - Database connection pool size: 20-50 connections
@@ -236,6 +242,7 @@ When deploying GHCP-Stats, the following parameters should be configured based o
   - Retention: 30 days of rolling backups
 
 ### Development Deployment
+
 - **Scaling Parameters**:
   - Single application instance
   - Database connection pool size: 5-10 connections
