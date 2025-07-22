@@ -48,3 +48,7 @@ Thumbs.db
 .macos/*
 streamlit-app/metrics
 metrics
+
+# Node.js dependencies
+node_modules/
+frontend/dist/
