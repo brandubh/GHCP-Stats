@@ -11,5 +11,10 @@
   "scripts": {
     "start": "vite",
     "build": "vite build"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0",
+    "@vitejs/plugin-react": "^4",
+    "typescript": "^5.0.0"
   }
 }
