@@ -1,21 +1,23 @@
 # GHCP-Stats
 
-GHCP-Stats is a small Streamlit application that imports GitHub Copilot metrics and visualises them in a web dashboard. Data is retrieved from the GitHub API, stored in a local SQLite database and displayed using interactive charts.
-
-The project was generated with the help of GitHub Copilot and is meant as an experiment in AI assisted development.
+GHCP-Stats was originally a Streamlit application. It now uses a
+**frontend/backend** architecture with **React** for the UI and **FastAPI** as
+the server. The application runs against a local SQLite database for
+development and automatically switches to Azure Cosmos DB when the `ENV`
+environment variable is set to `azure`.
 
 ## Repository layout
 
 ```
-app/            # containerised application
-  Dockerfile    # container definition
-  requirements.txt
-  src/          # Streamlit source code
+backend/        # FastAPI backend
+frontend/       # React frontend
 infrastructure/ # Azure deployment scripts and Bicep templates
- docs/          # project documentation
+docs/          # project documentation
 ```
 
-The application itself lives under `app/src` and is composed of a few Streamlit pages and some helper utilities for authentication and data import.
+The backend code lives in `backend/` while the React frontend resides in
+`frontend/`. A production Docker image bundles the compiled frontend together
+with the FastAPI server so the app can be run anywhere with a single command.
 
 ## Quick start
 
@@ -23,26 +25,35 @@ The application itself lives under `app/src` and is composed of a few Streamlit 
 
 1. Install dependencies:
    ```bash
-   pip install -r app/requirements.txt
+   pip install -r backend/requirements.txt
+   cd frontend && npm install
    ```
-2. Set the environment variables `ORG_LIST` (comma separated organisation names) and `GHCP_TOKEN` (GitHub token with access to the metrics API). Optionally set `DB_NAME` to the desired SQLite path.
-3. Run the application:
+2. Set the environment variables `ORG_LIST` and `GHCP_TOKEN`. Optional variables:
+   - `DB_NAME` – path to the SQLite database (defaults to `metrics.db`)
+   - `ENV=azure` plus `COSMOS_ENDPOINT` and `COSMOS_KEY` when running in Azure
+3. Run the backend and frontend during development:
    ```bash
-   streamlit run app/src/app.py
+   uvicorn backend.app.main:app --reload
+   npm start
    ```
 
 ### Container
 
-A `Dockerfile` is provided for container execution:
+A root `Dockerfile` builds the React frontend and bundles it with the FastAPI
+backend:
 
 ```bash
-docker build -t ghcp-stats ./app
-docker run -p 8501:8501 -e ORG_LIST=org -e GHCP_TOKEN=token ghcp-stats
+docker build -t ghcp-stats .
+docker run -p 8000:8000 -e ORG_LIST=org -e GHCP_TOKEN=token ghcp-stats
 ```
 
 ### Azure deployment
 
 Infrastructure templates for Azure Container Apps are located in the `infrastructure` folder. Deploy using `deploy.sh` and provide the required parameters and secrets.
+
+When deployed with `ENV=azure` the backend connects to Cosmos DB using the
+`COSMOS_ENDPOINT` and `COSMOS_KEY` variables. Locally these can be omitted to
+fall back to SQLite.
 
 See the documentation in the `docs/` folder for a detailed description of the configuration and deployment process.
 
