@@ -1,50 +1,191 @@
-# Python virtual environment
-.venv/
-venv/
-ENV/
-
-# Python cache files
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
-
-# Distribution / packaging
-dist/
+*.so
+.Python
 build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
 *.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
 
-# Environment variables
+# uv
+.venv/
 .env
 .env.local
 
-# Database files
-*.db
-*.sqlite
-*.sqlite3
+# PyInstaller
+*.manifest
+*.spec
 
-# IDE specific files
-.idea/
-.vscode/
-*.swp
-*.swo
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
 
-# OS specific files
-.DS_Store
-Thumbs.db
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
 
-# Streamlit specific
-.streamlit/secrets.toml
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+.pybuilder/
+target/
 
 # Jupyter Notebook
 .ipynb_checkpoints
 
-# Log files
-*.log
+# IPython
+profile_default/
+ipython_config.py
 
-# Data files (uncomment if needed)
-# data/*.csv
-# data/*.json
+# pyenv
+.python-version
 
-.macos/*
-streamlit-app/metrics
-metrics
+# pipenv
+Pipfile.lock
+
+# poetry
+poetry.lock
+
+# pdm
+.pdm.toml
+.pdm-python
+.pdm-build/
+
+# PEP 582
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.venv
+.macos/
+.macos-uv
+ENV/
+env/
+venv/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+# Cython debug symbols
+cython_debug/
+
+# PyCharm
+.idea/
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Streamlit
+.streamlit/
+
+# Application specific
+*.db
+*.sqlite
+*.sqlite3
+data/
+logs/
+temp/
+tmp/
+
+# Azure
+*.publishsettings
+*.azurePubxml
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Docker
+.dockerignore
+
+# Secrets and keys
+*.key
+*.pem
+*.crt
+*.p12
+secrets.json
+.secrets/
+
+# Local configuration files
+config.local.*
+*.local
+local.*
+
+# Backup files
+*.bak
+*.backup
+*~

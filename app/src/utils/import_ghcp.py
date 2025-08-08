@@ -52,8 +52,8 @@ def import_metrics() -> None:
     If running on Azure, copies the database file from persistent storage to local storage before import,
     and back to persistent storage after import.
 
-    Raises:
-        RuntimeError: If the GitHub token is not found.
+    Notes:
+        Displays an error message and stops execution if the GitHub token is not found.
     """
     import shutil
     import logging
